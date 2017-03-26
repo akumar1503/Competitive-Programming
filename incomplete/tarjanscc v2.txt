@@ -1,0 +1,79 @@
+#define fi freopen("../../../../../Desktop/input.txt", "r", stdin);
+#define fo freopen("../../../../../Desktop/output.txt", "w", stdout)
+#define fio fi fo
+#define  _CRT_SECURE_NO_WARNINGS
+#include<stdio.h>
+#include<math.h>
+#include<iostream>
+#include<vector>
+#include<cstring>
+#include<string>
+#include<algorithm>
+#include<map>
+#include<queue>
+using namespace std;
+#define fr(i,a,n) for(int i = (int)(a); i < (int)(n); i++)
+#define pb(x) push_back(x)
+#define   max(a,b)     (a>b?a:b)
+#define   min(a,b)     (a>b?b:a)
+#define INF 1000009999909999  
+#define   mp(a,b)      pair<int,int>(a,b)
+typedef long long int ll;
+
+int n, m, nscc=0;
+vector<vector<int> >adjMat;
+vector<int>dfs_num, dfs_low, S, visited;
+int dfsNumCount = 0;  ll ans = 0;
+void init() { dfs_num.assign(n, -1); dfs_low.assign(n, 0); visited.assign(n, 0); S.clear(); }
+
+void tarjanSCC(int node) {
+	//cout << node << ", ";
+	
+	dfs_num[node] = dfs_low[node] = dfsNumCount++;
+	visited[node] = 1;
+	S.push_back(node);
+
+	fr(i, 0, adjMat[node].size()) {
+		int v = adjMat[node][i];
+		if (dfs_num[v] == -1)
+			tarjanSCC(v);
+		if (visited[v])dfs_low[node] = min(dfs_low[node], dfs_low[v]);
+	}
+	//	visited[node] = 0;
+
+	if (dfs_low[node] == dfs_num[node]) {
+		int sz = 0;
+		nscc++;
+		//if (nscc > 2) { cout << "NO\n";  }
+
+		while (1) {
+			int u = S.back(); S.pop_back(); visited[u] = 0;
+			if (u == node)break;		
+			
+		}
+		ans += (1 << sz) - 2;
+	}
+	
+}
+
+int main()
+{
+	fio; 
+	int t;  cin >> t;
+	while (t--) {
+		bool flag = true;
+		cin >> n >> m;
+		adjMat.clear();  adjMat.resize(n);
+		int u, v;
+		fr(i, 0, m) { cin >> u >> v; adjMat[u - 1].push_back(v - 1); adjMat[v - 1].push_back(u - 1); }
+		init(); nscc = 0;
+		fr(i, 0, n) {
+			if (!visited[i])tarjanSCC(i);
+		}
+		if (nscc > 2)cout << "NO\n";
+		else cout << "YES\n";
+
+	}
+	return 0;
+}
+

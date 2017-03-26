@@ -1,0 +1,5 @@
+1. Digit Dp
+2. Subset Sum for total sum <= 1e6 using dp  ->   http://codeforces.com/blog/entry/49812
+3. Dsu On Tree                               ->   http://codeforces.com/blog/entry/44351
+4. Grundy Numbers and Nim Game
+5. Prefix Sum      ->    http://codeforces.com/contest/776/problem/C          

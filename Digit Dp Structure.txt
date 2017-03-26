@@ -1,0 +1,48 @@
+#include "bits/stdc++.h"
+using namespace std;
+typedef long long int LL;
+LL dp[20][2][164][1460];
+int str[20];
+LL L,R;
+
+int toString(LL n){
+	int temp=0;
+	while(n){
+		str[++temp]=n%10;
+		n/=10;
+	}
+	return temp;
+}
+
+
+LL rec(int len, bool isEqual, int sum, int sqSum) {
+	if (len == 0) { return __gcd(sum,sqSum)==1; }
+	LL& ans = dp[len][isEqual][sum][sqSum];
+	if (ans != -1)return ans;
+	int lim=9;
+	if(isEqual)lim=str[len];
+	ans=0;
+	for (int i = 0; i<=lim; i++)
+			ans += rec(len - 1, (i==lim?(isEqual?true:false):false), sum+i, sqSum+i*i);
+	
+	return ans;
+}	
+
+int main(){	
+	
+	int t; scanf("%d",&t);	
+	while(t--){
+		
+		scanf("%lli%lli",&L,&R);
+		// scanf("%lli%d",&R,&K);
+		
+		memset(dp,-1,sizeof dp);
+		LL ans=rec(toString(R),true,0,0);
+		// cout<<ans<<endl;
+		// memset(dp,-1,sizeof dp);
+		ans-=rec(toString(L-1),true,0,0);
+		printf("%lli\n", ans);
+	}
+
+    return 0;
+}

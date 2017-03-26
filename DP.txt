@@ -1,0 +1,4 @@
+http://codeforces.com/blog/entry/8219
+Search Google "dynamic programming optimizations"
+1.Convex Hull Trick
+2.Dp on Tree

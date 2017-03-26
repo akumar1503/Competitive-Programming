@@ -1,0 +1,85 @@
+#define fi freopen("../../../../../Desktop/input.txt", "r", stdin);
+#define fo freopen("../../../../../Desktop/output.txt", "w", stdout)
+#define fio fi fo
+#define  _CRT_SECURE_NO_WARNINGS
+#include<stdio.h>
+#include<math.h>
+#include<iostream>
+#include<vector>
+#include<cstring>
+#include<string>
+#include<algorithm>
+#include<map>
+#include<queue>
+using namespace std;
+#define FOR(i,a,n) for(int i = (int)(a); i < (int)(n); i++)
+#define pub(x) push_back(x)
+#define   MAX(a,b)     (a>b?a:b)
+#define   MIN(a,b)     (a>b?b:a)
+#define	INF 1000009999909999  
+#define   mp(a,b)      pair<int,int>(a,b)
+typedef long long int ll; 
+vector< vector<int> >G;
+int N, Q;
+
+class EulerTreeTour {
+	/*1-based indexing*/
+	int eind=1,*E = new int[2 * N]; 
+	int hind=1,*H = new int[N+1];  
+	bool *visited = new bool[N + 1];
+	
+	void dfs(int u) {
+		visited[u] = true;
+		H[u] = eind, E[eind++] = u;
+		for (int i = 0; i < G[u].size(); i++) {
+			int v = G[u][i];
+			if (visited[v])continue;
+			dfs(v);
+		}
+		E[eind++] = u;
+	};
+};
+
+class ST :private EulerTreeTour {
+	int len;
+	int *tree;
+	EulerTreeTour eulerTreeTour;  
+	
+	ST() { eulerTreeTour.dfs(1); }
+
+	void build(int n, int *a) {
+		len = n;
+		tree = new int[2 * len];
+		for (int i = 0; i < n; i++)tree[i + n] = a[i];
+		for (int i = n - 1; i > 0; i--)tree[i] = MIN(tree[i << 1], tree[i << 1 | 1]);	
+	}
+	int query(int l, int r) {
+		int min = INF;
+		for (l += len, r += len; l < r; l >>= 1, r >>= 1) {
+			if (l & 1) { if (min > tree[l++])min=tree[l-1]; }
+			if (r & 1) { if (min > tree[--r])min = tree[r]; }
+		}
+		return min;
+	}
+	int LCA(int u, int v) { return query(eulerTreeTour.H[u] + len, eulerTreeTour.H[v] + len); }
+};
+
+
+
+
+
+
+
+int main(){	
+	/*Preprocessing ends*/
+	scanf("%d%d", &N, &Q);
+	int u, v;  G.resize(N);
+	FOR(i, 0, N - 1) { scanf("%d%d", &u, &v); G[u].pub(v); G[v].pub(u); }	
+	/*Input ends*/
+		
+
+
+
+	return 0;
+}
+ 

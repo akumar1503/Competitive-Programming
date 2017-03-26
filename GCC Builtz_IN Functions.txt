@@ -1,0 +1,10 @@
+int popcount(ll a)
+{
+	int c=0;
+	while(a)
+	{
+		c++;
+		a-=a&-a;
+	}
+	return c;
+}

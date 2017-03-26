@@ -1,0 +1,54 @@
+//http://codeforces.com/contest/461/problem/B
+//http://codeforces.com/blog/entry/20935
+#include "bits/stdc++.h"
+using namespace std;
+typedef long long int LL;
+#define forn(i,n)  for(int i=0;i<n;i++)
+#define si(t)      scanf("%d",&t)
+const int MOD = 1e9 + 7;
+const int maxn = 1e+5;
+vector<int> G[maxn];
+int n, c[maxn], dp[maxn][2];
+
+void rec(int u, int p) {
+	if (!c[u])
+		goto down;
+
+	dp[u][1] = 1;
+	dp[u][0] = 1;
+	for (auto v : G[u]) {
+		if (v == p)continue;
+		rec(v, u);
+		dp[u][1] *= dp[v][0];
+	}
+	return;
+	
+down:
+	bool flag = false;
+	dp[u][0] = 1;
+	dp[u][1] = 0;
+	for (auto v : G[u]) {
+		if (v == p)continue;
+		rec(v, u);
+		dp[u][0] *= dp[v][0];
+		dp[u][1] += dp[v][1];
+		if (dp[v][1] == 0)flag = true;
+	}
+	//if (flag)dp[u][1] = 0;
+}
+int main() {
+#ifdef fi
+	freopen("../../../../../Desktop/input.txt", "r", stdin);
+	freopen("../../../../../Desktop/output.txt", "w", stdout);
+#endif 
+	si(n);  int u, v, isBlack = 0;
+	forn(i, n - 1) { si(u); G[u].push_back(i+1);G[i+1].push_back(u); }
+	forn(i, n) { si(c[i]); if (c[i] == 1)isBlack++; }
+	if (isBlack == 0) { printf("0");return 0; }
+	if (isBlack == 1) { printf("1");return 0; }
+	
+	rec(0, -1);
+	printf("%d", dp[0][1]);
+
+	return 0;
+} 

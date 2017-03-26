@@ -1,0 +1,61 @@
+#define PI 3.14159265
+
+double rad2Deg(double rad) {
+	return (180 * rad) / PI;
+}
+double deg2Rad(double deg) {
+	return (PI*deg) / 180;
+}
+
+struct Point {
+	double x, y;
+	Point() { x = y = 0.0; }
+	Point(double _x, double _y) : x(_x), y(_y) {}
+	bool operator < (Point other) const { // override less than operator
+		if (fabs(x - other.x) > eps) // useful for sorting
+			return x < other.x; // first criteria , by x-coordinate
+		return y < other.y;
+	}
+	bool operator == (Point other) const {
+		return (fabs(x - other.x) < eps && (fabs(y - other.y) < eps));
+	}
+	double dist(Point p1, Point p2) { // Euclidean distance
+									  // hypot(dx, dy) returns sqrt(dx * dx + dy * dy)
+		return hypot(p1.x - p2.x, p1.y - p2.y);
+	} // return double
+	  // rotate p by theta degrees CCW w.r.t origin (0, 0)
+	point rotate(Point p, double theta) {
+		double rad = deg2Rad(theta); // multiply theta with PI / 180.0
+		return Point(p.x * cos(rad) - p.y * sin(rad),
+			p.x * sin(rad) + p.y * cos(rad));
+	}
+}; // second criteria, by y-coordinate
+
+struct Line { double a, b, c; }; // a way to represent a line								 
+void pointsToLine(point p1, point p2, line &l) {
+	// the answer is stored in the third parameter (pass by reference)
+	if (fabs(p1.x - p2.x) < eps) { // vertical line is fine
+		l.a = 1.0; l.b = 0.0; l.c = -p1.x; // default values
+	}
+	else {
+		l.a = -(double)(p1.y - p2.y) / (p1.x - p2.x);
+		l.b = 1.0; // IMPORTANT: we fix the value of b to 1.0
+		l.c = -(double)(l.a * p1.x) - p1.y;
+	}
+}
+bool areParallel(line l1, line l2) { // check coefficients a & b
+	return (fabs(l1.a - l2.a) < eps) && (fabs(l1.b - l2.b) < eps);
+}
+bool areSame(line l1, line l2) { // also check coefficient c
+	return areParallel(l1, l2) && (fabs(l1.c - l2.c) < eps);
+}
+// returns true (+ intersection point) if two lines are intersect
+bool areIntersect(line l1, line l2, point &p) {
+	if (areParallel(l1, l2)) return false; // no intersection
+										   // solve system of 2 linear algebraic equations with 2 unknowns
+	p.x = (l2.b * l1.c - l1.b * l2.c) / (l2.a * l1.b - l1.a * l2.b);
+	// special case: test for vertical line to avoid division by zero
+	if (fabs(l1.b) > eps) p.y = -(l1.a * p.x + l1.c);
+	else p.y = -(l2.a * p.x + l2.c);
+	return true;
+}

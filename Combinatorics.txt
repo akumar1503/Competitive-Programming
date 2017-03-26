@@ -1,0 +1,18 @@
+//nCr
+#define maxn 100002
+ll fact[maxn], ifact[maxn];
+void pre_ncr(int limit) {
+	fact[0] = ifact[0] = 1;
+	for (int i = 1; i < limit; ++i) {
+		fact[i] = (fact[i - 1] * i) % MOD;
+		ifact[i] = modularExp(fact[i], MOD - 2);
+	}
+}
+int ncr(int n, int r) {
+	if (r<0 || n<r)
+		return 0;
+	ll ans = fact[n];
+	ans = (ans*ifact[r]) % MOD;
+	ans = (ans*ifact[n - r]) % MOD;
+	return ans;
+}
