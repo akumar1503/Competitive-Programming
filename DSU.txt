@@ -1,0 +1,19 @@
+int par[maxn], sz[maxn];
+
+
+int root(int x) {
+    if (x == par[x]) return x;
+    return par[x] = root(par[x]);
+}
+
+
+void unite(int x, int y) {
+    x = root(x); y = root(y);
+    if (x == y) return;
+    if (sz[x] < sz[y]) swap(x, y);
+    sz[x] += sz[y];
+    par[y] = x;
+}
+
+//In main
+forn(i, n) par[i] = i, sz[i] = 1;

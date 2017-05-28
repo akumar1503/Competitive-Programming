@@ -1,55 +1,27 @@
-// Class for Fenwick tree.
-class Fenwick {
-  vector<int> f;
-
- public:
-  Fenwick(int n) {
-    f.assign(n, 0);
-  }
-
-  void upd(int i, int val) {
-    for (; i < f.size(); i |= i + 1) f[i] += val;
-  }
-
-  int get(int i) const {
-    int res = 0;
-    for (; i >= 0; i = (i & (i + 1)) - 1) {
-      res += f[i];
-    }
-    return res;
-  }
-};
-
-
-/////////////////////
-
-
-
-
-int BIT[1000], a[1000], n;
-void update(int x, int delta)
-{
-      for(; x <= n; x += x&-x)
-        BIT[x] += delta;
+int fen[MAX_N];
+void update(int p,int val){
+	for(int i = p;i <= n;i += i & -i)
+		fen[i] += val;
 }
-int query(int x)
-{
-     int sum = 0;
-     for(; x > 0; x -= x&-x)
-        sum += BIT[x];
-     return sum;
+int sum(int p){
+	int ans = 0;
+	for(int i = p;i;i -= i & -i)
+		ans += fen[i];
+	return ans;
 }
 
-int main()
+
+/*   2D - Fenwick Tree   */
+long long tree[2010][2010];
+void add(int x,int y,int val)
 {
-     scanf(“%d”, &n);
-     int i;
-     for(i = 1; i <= n; i++)
-     {
-           scanf(“%d”, &a[i]);
-           update(i, a[i]);
-     }
-     printf(“sum of first 10 elements is %d\n”, query(10));
-     printf(“sum of all elements in range [2, 7] is %d\n”, query(7) – query(2-1));
-     return 0;
+    int i,j;
+    for(i=x;i<=n;i+=i&(-i)) for(j=y;j<=m;j+=j&(-j)) tree[i][j] += val;
+}
+long long query(int x,int y)
+{
+    int i,j;
+    long long ret = 0;
+    for(i=x;i;i-=i&(-i)) for(j=y;j;j-=j&(-j)) ret += tree[i][j];
+    return ret;
 }

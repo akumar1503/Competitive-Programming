@@ -12,47 +12,42 @@ void primeGen(int lim) {
 	}
 }
 
-int binaryExp(int x,int n)
+int binE(int x,int n)
 {
     long long result=1;
     while(n>0)
     {
         if(n % 2 ==1)
-            result=result * x;
-        x=x*x;
-        n=n/2;
+            result = result * x;
+        x = 1ll * x * x;
+        n = n / 2;
     }
     return result;
 }
 
 
 
-int modularExp(int x,int n)
+int modE(int x,int n)
 {
     long long result=1;
     while(n>0)
     {
         if(n % 2 ==1)
-            result=(result * x)%MOD;
-        x=(x*x)%MOD;
+            result = (result * x) % MOD;
+        x = (1ll * x * x) % MOD;
         n=n/2;
     }
     return result;
 }
 
-void addMod(long long &a, long long b) {
+void adMd(long long &a, long long b) {
 	a += b;
 	if(a >= MOD) a -= MOD;
 	if(a < 0) a += MOD;
 }
 
 
-int GCD(int A, int B) {
-    if(B==0)
-        return A;
-    else
-        return GCD(B, A % B);
-}
+int gcd(int A, int B) { return B==0?A:gcd(B, A % B); }
 
 
 
@@ -167,11 +162,174 @@ vector<int> factorize(int n) {
     return res;
 }//The required factors are in res
 
-
-
-
-
-
+ll gcd(ll q,ll d,ll &x,ll &y) {
+	if(d%q==0) {
+		x=1;
+		y=0;
+		return q;
+	}
+	ll x1,y1;
+	ll ans = gcd(d%q,q,x1,y1);
+	y=x1;
+	x=y1-(d/q)*x1;
+	return ans;
+}
+ll Inv(ll n,ll m) {
+	ll x,y;
+	ll g= gcd(n,m,x,y);
+	if(g==1) {
+		return (x+m)%m;
+	}
+	assert(0);
+	return -1;
+}
+//x%mi = ri
+ll CRT(std::vector<ll> &m,std::vector<ll> &r,ll &M) {
+	M=1;
+	int n=m.size();
+	for (int i = 0; i < n; ++i)
+	{
+		M*=m[i];
+	}
+	ll x=0;
+	for (int i = 0; i < n; ++i)
+	{
+		ll p = M/m[i];
+		ll pi = Inv(p,m[i]);
+		x=(x+r[i]*p*pi)%M;
+	}
+	return x;
+}
+ 
+ll nCr(ll n,ll r,ll p,std::vector<ll> &fact){
+	if(r>n)
+		return 0;
+	ll N=fact[n];
+	ll D = (fact[r]*fact[n-r])%p;
+	ll ans = (N*Pow(D,p-2,p))%p;
+	return ans;
+}
+ 
+std::map<ll, std::vector<ll> > FACTMAP;
+ll lucas(ll n,ll r,ll P) {
+	if(FACTMAP.find(P)==FACTMAP.end()) {
+		std::vector<ll> fact(P+1,1);
+		for (int i = 1; i <= P; ++i)
+		{
+			fact[i]=(fact[i-1]*i)%P;
+		}
+		FACTMAP[P]=fact;
+	}
+ 
+	std::vector<ll> &fact=FACTMAP[P];
+	ll prod=1;
+ 
+	while(n>0 && r>0) {
+		ll N=n%P;
+		ll R=r%P;
+		n/=P;
+		r/=P;
+		prod=(prod*nCr(N,R,P,fact))%P;
+	}
+	return prod;
+}
+map<pair<int,int>,std::vector<ll> > mapSpecialFac;
+//n!! part which is gcd with p^power
+// return n!! , power of p in n!
+ 
+pair<ll,int> specialFac(ll n,ll p,ll power,ll m) {
+	// m = p^power
+	std::vector<ll> &fac=mapSpecialFac[mp((int)p,(int)m)];
+	if(fac.size()==0) {
+		fac.resize(m,1);
+		for (int i = 2; i <m; ++i)
+		{
+			fac[i]=(fac[i-1]* ((i%p)?i:1)  )%m;
+		}	
+	}
+	if(n<p) {
+		return mp(fac[n],0);
+	}
+ 
+	ll ans = fac[m-1],part2=fac[n%m];
+ 
+	ans=(Pow(ans,n/m,m)*part2)%m;
+ 
+	int pc = 0;
+	ll val = ans;//Pow(specialFac(p-1,p,power,m).first,n/p,m);
+	// what_is(val);
+	// val=(val*specialFac(n%p,p,power,m).first)%m;
+	// what_is(val);
+	pair<ll,int> sol = specialFac(n/p,p,power,m);
+	// what_is(sol.first);
+	val=(val*sol.first)%m;
+	// cerr<<"SPFactorial "<<n<<"%"<<m<<" = "<<val<<"   cnt "<<(sol.second + n/p)<<endl;
+	return mp(val,sol.second + n/p);	
+} 
+ 
+ll nCr_primepow(ll n,ll r,ll p,ll power,ll m) {
+	// m = p^power
+	pair<ll,int> solN = specialFac(n,p,power,m);
+	pair<ll,int> solD1 = specialFac(r,p,power,m);
+	pair<ll,int> solD2 = specialFac(n-r,p,power,m);
+	pair<ll,int> solD = mp((solD1.first*solD2.first)%m,solD1.second+solD2.second);
+ 
+	ll v2 = Inv(solD.first,m);
+	// cout<<"Inverse of "<<(solD.first)<<" from "<<m<<" is "<<v2<<endl;
+	solN.second-=solD.second;
+	// cerr<<"p^"<<(solN.second)<<" left\n";
+	assert(solN.second>=0);
+	ll ans = ((solN.first*v2)%m);
+	// ans=(ans*Pow(p,max(0LL,min((ll)solN.second,power-1)),m))%m;
+	ans=(ans*Pow(p,solN.second,m))%m;
+	// cout<<n<<"C"<<r<<"%"<<m<<" = "<<ans<<endl;
+	return (m+ans)%m;
+}
+ 
+ll bestnCrM(ll N,ll R,ll M) {
+	ll M1=M;
+	if(M==1)
+		return 0;
+	//mod p^i
+ 
+	std::vector<ll > mod;
+	std::vector<int > p;
+	std::vector<int > power;
+ 
+	std::vector<ll> rem;
+ 
+	for (int i = 2; i*i <= M; ++i)
+	if(M%i==0) {
+		ll x=1;
+		int c=0;
+		while(M%i==0) {
+			M/=i;
+			x*=i;
+			c++;
+		}
+		mod.push_back(x);
+		power.push_back(c);
+		p.push_back(i);
+ 
+	}
+	if(M!=1) {
+		mod.push_back(M);
+		power.push_back(1);
+		p.push_back(M);
+ 
+	}
+	for (int i = 0; i < (int)mod.size(); ++i)
+	{
+		rem.push_back(nCr_primepow(N,R,p[i],power[i],mod[i]));
+		// cout<<">"<<(*rem.rbegin())<<" "<<mod[i]<<endl;
+	}
+	ll M2;
+	ll ans = CRT(mod,rem,M2)%M1;
+	assert(M2==M1);
+	// ans%=M1;
+	ans=(ans+M1)%M1;
+	return ans;
+}
 
 
 
